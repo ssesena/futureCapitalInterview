@@ -1,6 +1,7 @@
 import json
 import sys
 
+
 INPUT_ARG_LENGTH = 3
 
 def calculateStockPortfolioValue(stock_portfolio_input):
@@ -31,7 +32,8 @@ def calculateStockPortfolioValue(stock_portfolio_input):
 
         # Raise error is ticker does not exist
         if not ticker_found:
-            raise KeyError("Stock " + stock + " was not found \n Please input an existing stock ticker")
+            raise KeyError("Stock " + stock + " was not found. Please input an existing stock ticker")
+        ticker_found = False
 
     # Closing file
     json_file.close()
@@ -52,7 +54,9 @@ def parseStockPortfolioQuantitiesIntoDictionary(stock_portfolio_input):
             ticker_to_quant = stock.split(":")
             if len(ticker_to_quant) > 2 or len(ticker_to_quant) < 2:
                 raise SyntaxError("Portfolio input was not formatted correctly")
-            portfolio[ticker_to_quant[0]] = int(ticker_to_quant[1])
+            if float(ticker_to_quant[1]) < 0:
+                raise ValueError("Portfolio cannot have negative quantities")
+            portfolio[ticker_to_quant[0]] = float(ticker_to_quant[1])
         return portfolio
     except:
         print("--------------------------INPUT WAS NOT IN CORRECT FORMAT--------------------------")
@@ -63,7 +67,7 @@ def findMaximumProfits(projected_stock_prices_input):
     Finds the max possible profit given an array of projected stock prices
 
     :param projected_stock_prices_input: str, stock price array as a string input
-    :return: int, max profit possible given projected stock prices
+    :return: float, max profit possible given projected stock prices
     """
 
     projected_stock_prices = parseProjectedStockPricesIntoArray(projected_stock_prices_input)
@@ -96,10 +100,12 @@ def parseProjectedStockPricesIntoArray(projected_stock_prices_input):
     """
     try:
         values_as_strings = projected_stock_prices_input.split(",")
-        values_as_int = []
+        values_as_float = []
         for value in values_as_strings:
-            values_as_int.append(int(value))
-        return values_as_int
+            if float(value) < 0:
+                raise ValueError("Stock price cannot be negative")
+            values_as_float.append(float(value))
+        return values_as_float
     except:
         print("--------------------------INPUT WAS NOT IN CORRECT FORMAT--------------------------")
         raise
